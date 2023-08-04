@@ -14,6 +14,7 @@
       "release:finalize": "node ./node_modules/@silvermine/standardization/scripts/release.js finalize"
    },
    "author": "Ethan Smith",
+   "repository": "github:onebytegone/xmfr",
    "license": "MIT",
    "dependencies": {
       "chalk": "4.1.2",
