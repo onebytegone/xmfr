@@ -3,6 +3,14 @@
 All notable changes to this project will be documented in this file.
 See [our coding standards][commit-messages] for commit guidelines.
 
+### [0.0.2](https://github.com/onebytegone/xmfr/compare/v0.0.1...v0.0.2) (2023-08-04)
+
+
+### Features
+
+* auto-publish to npm with provenance ([c26d60b](https://github.com/onebytegone/xmfr/commit/c26d60b92df4e9bc3dce2ef985584739278b0e86))
+
+
 ### 0.0.1 (2023-08-04)
 
 
