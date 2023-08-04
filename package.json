@@ -15,6 +15,11 @@
    },
    "author": "Ethan Smith",
    "license": "MIT",
+   "dependencies": {
+      "chalk": "4.1.2",
+      "commander": "11.0.0",
+      "handlebars": "4.7.8"
+   },
    "devDependencies": {
       "@silvermine/eslint-config": "3.1.0",
       "@silvermine/standardization": "2.2.0",
