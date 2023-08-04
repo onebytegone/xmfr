@@ -1,4 +1,4 @@
-# xfmr (Transformer)
+# xmfr (Transformer)
 
 This is a node-based CLI tool to transform JSON data into a more human consumable format
 using templates.
