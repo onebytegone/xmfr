@@ -1,6 +1,6 @@
 {
    "name": "xmfr",
-   "version": "0.0.1",
+   "version": "0.0.2",
    "description": "CLI tool to transform JSON into text using a template",
    "bin": "src/cli.js",
    "scripts": {
