@@ -1,0 +1,22 @@
+{
+   "name": "xmfr",
+   "version": "0.0.1",
+   "description": "CLI tool to transform JSON into text using a template",
+   "bin": "src/cli.js",
+   "scripts": {
+      "check-node-version": "check-node-version --npm 8.5.5",
+      "eslint": "eslint .",
+      "markdownlint": "markdownlint-cli2",
+      "standards": "npm run markdownlint && npm run eslint",
+      "release:preview": "node ./node_modules/@silvermine/standardization/scripts/release.js preview",
+      "release:prep-changelog": "node ./node_modules/@silvermine/standardization/scripts/release.js prep-changelog",
+      "release:finalize": "node ./node_modules/@silvermine/standardization/scripts/release.js finalize"
+   },
+   "author": "Ethan Smith",
+   "license": "MIT",
+   "devDependencies": {
+      "@silvermine/eslint-config": "3.1.0",
+      "@silvermine/standardization": "2.2.0",
+      "check-node-version": "4.2.1"
+   }
+}
