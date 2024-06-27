@@ -17,7 +17,7 @@
    "repository": "github:onebytegone/xmfr",
    "license": "MIT",
    "dependencies": {
-      "chalk": "4.1.2",
+      "chalk": "5.3.0",
       "commander": "11.1.0",
       "handlebars": "4.7.8"
    },
