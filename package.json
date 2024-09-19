@@ -22,7 +22,7 @@
       "handlebars": "4.7.8"
    },
    "devDependencies": {
-      "@silvermine/eslint-config": "3.2.0",
+      "@silvermine/eslint-config": "3.2.1",
       "@silvermine/standardization": "2.2.3",
       "check-node-version": "4.2.1"
    }
