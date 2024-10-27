@@ -95,6 +95,10 @@ async function readTemplate(nameOrFilePath) {
       return context.length;
    });
 
+   Handlebars.registerHelper('stripTags', (context) => {
+      return context ? context.replace(/<[^>]*>?/gm, '') : context;
+   });
+
    if (!stdinRecords) {
       logger.errorAndQuit('No input was piped into stdin');
    }
