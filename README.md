@@ -76,11 +76,19 @@ $ cat newline-delimited-items.ndjson | xmfr --print-context
 }
 ```
 
-## Options
+## Usage
+
+### Options
 
    * `-t <path>` / `--template <path>`
    * `--print-context`
    * `--help`
+
+### Install/Upgrade
+
+```bash
+npm i -g 'git@github.com:onebytegone/xmfr.git'
+```
 
 ## License
 
