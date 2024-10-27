@@ -12,7 +12,7 @@ $ cat single-item.json
 {
    "animal": "Aardvark"
 }
-$ cat single-item.json | xfmr --print-context
+$ cat single-item.json | xmfr --print-context
 {
    "record": { "animal": "Aardvark" },
    "records": [
@@ -30,7 +30,7 @@ $ cat array-of-items.json
    { "animal": "Beaver" },
    { "animal": "Capybara" }
 ]
-$ cat array-of-items.json | xfmr --print-context
+$ cat array-of-items.json | xmfr --print-context
 {
    "record": { "animal": "Aardvark" },
    "records": [
@@ -48,7 +48,7 @@ $ cat newline-delimited-items.ndjson
 { "animal": "Aardvark" }
 { "animal": "Beaver" }
 { "animal": "Capybara" }
-$ cat newline-delimited-items.ndjson | xfmr --print-context
+$ cat newline-delimited-items.ndjson | xmfr --print-context
 {
    "record": { "animal": "Aardvark" },
    "records": [
@@ -59,11 +59,36 @@ $ cat newline-delimited-items.ndjson | xfmr --print-context
 }
 ```
 
-## Options
+### Markdown with Front Matter
+
+```bash
+$ cat document.md
+---
+title: Animals
+---
+Aardvark Beaver Capybara
+$ cat newline-delimited-items.ndjson | xmfr --print-context
+{
+   "record": { "title": "Animals", "body", "Aardvark Beaver Capybara" },
+   "records": [
+      { "title": "Animals", "body", "Aardvark Beaver Capybara" }
+   ]
+}
+```
+
+## Usage
+
+### Options
 
    * `-t <path>` / `--template <path>`
    * `--print-context`
    * `--help`
+
+### Install/Upgrade
+
+```bash
+npm i -g 'git@github.com:onebytegone/xmfr.git'
+```
 
 ## License
 

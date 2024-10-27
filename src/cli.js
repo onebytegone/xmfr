@@ -6,6 +6,8 @@ const { program } = require('commander'),
       chalk = require('chalk'),
       readline = require('readline'),
       Handlebars = require('handlebars'),
+      marked = require('marked'),
+      fm = require('front-matter'),
       fs = require('fs'),
       path = require('path');
 
@@ -44,16 +46,27 @@ async function readPipedInput() {
    return new Promise((resolve) => {
       const objects = [];
 
-      let buf = '';
+      let buf = '',
+          mode;
 
       rl.on('line', (line) => {
+         if (!mode) {
+            if (line === '---') {
+               mode = 'frontmatter';
+            } else {
+               mode = 'json';
+            }
+         }
+
          buf += line + '\n';
 
          // After each line, attempt to parse the buffer. This is what supports ndjson.
          // TODO: What's the perf impact of this?
          try {
-            objects.push(JSON.parse(buf));
-            buf = '';
+            if (mode === 'json') {
+               objects.push(JSON.parse(buf));
+               buf = '';
+            }
          } catch(e) {
             // noop
          }
@@ -61,7 +74,16 @@ async function readPipedInput() {
 
       rl.once('close', () => {
          if (buf) {
-            objects.push(JSON.parse(buf));
+            if (mode === 'json') {
+               objects.push(JSON.parse(buf));
+            } else if (mode === 'frontmatter') {
+               const { attributes, body } = fm(buf);
+
+               objects.push({
+                  ...attributes,
+                  body,
+               });
+            }
          }
 
          resolve(objects);
@@ -93,6 +115,14 @@ async function readTemplate(nameOrFilePath) {
 
    Handlebars.registerHelper('length', (context) => {
       return context.length;
+   });
+
+   Handlebars.registerHelper('stripTags', (context) => {
+      return context ? context.replace(/<[^>]*>?/gm, '') : context;
+   });
+
+   Handlebars.registerHelper('markdown', (context) => {
+      return new Handlebars.SafeString(marked.parse(context));
    });
 
    if (!stdinRecords) {
