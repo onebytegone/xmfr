@@ -11,7 +11,8 @@ const { program } = require('commander'),
 
 program
    .option('-t, --template <filename>', 'the template to render with', 'simple-list')
-   .option('-v, --verbose', 'enable verbose debug logging');
+   .option('-v, --verbose', 'enable verbose debug logging')
+   .option('--print-context', 'print the template context and quit');
 
 program.parse();
 
@@ -103,7 +104,10 @@ async function readTemplate(nameOrFilePath) {
       records: stdinRecords,
    };
 
-   logger.debug(`Template Context: ${JSON.stringify(templateContext, undefined, 3)}`);
+   if (options.printContext) {
+      process.stdout.write(JSON.stringify(templateContext, undefined, 3) + '\n');
+      process.exit(0); // eslint-disable-line no-process-exit
+   }
 
    process.stdout.write(template(templateContext));
 })();
