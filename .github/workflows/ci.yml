@@ -17,3 +17,5 @@ jobs:
          - run: npm i -g npm@8.5.5
          - run: npm ci
          - run: npm run standards
+         - run: npm run build
+         - run: npm run generate-examples
