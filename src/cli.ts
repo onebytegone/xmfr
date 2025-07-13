@@ -5,12 +5,13 @@ import Handlebars from 'handlebars';
 import marked from 'marked';
 import fm from 'front-matter';
 import path from 'path';
-import { readFile } from 'fs/promises';
+import { readFile, writeFile } from 'fs/promises';
 
 program
    .option('-t, --template <filename>', 'the template to render with', 'simple-list')
    .option('-v, --verbose', 'enable verbose debug logging')
-   .option('--print-context', 'print the template context and quit');
+   .option('--print-context', 'print the template context and quit')
+   .option('-o, --output <filename>', 'write output to file');
 
 program.parse();
 
@@ -153,5 +154,9 @@ interface TemplateContext {
       process.exit(0); // eslint-disable-line no-process-exit
    }
 
-   process.stdout.write(template(templateContext));
+   if (options.output) {
+      await writeFile(options.output, template(templateContext));
+   } else {
+      process.stdout.write(template(templateContext));
+   }
 })();
