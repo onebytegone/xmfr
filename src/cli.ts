@@ -6,6 +6,7 @@ import marked from 'marked';
 import fm from 'front-matter';
 import path from 'path';
 import { readFile, writeFile } from 'fs/promises';
+import { readFileSync } from 'fs';
 
 program
    .option('-t, --template <filename>', 'the template to render with', 'simple-list')
@@ -138,6 +139,10 @@ interface TemplateContext {
       return new Handlebars.SafeString(marked.parse(context, {
          async: false,
       }));
+   });
+
+   Handlebars.registerHelper('rawFileContents', (context: string): unknown => {
+      return new Handlebars.SafeString(readFileSync(path.resolve(__dirname, '..', context), 'utf-8'));
    });
 
    if (!stdinRecords) {
