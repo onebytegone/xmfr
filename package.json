@@ -2,8 +2,11 @@
    "name": "xmfr",
    "version": "0.0.2",
    "description": "CLI tool to transform JSON into text using a template",
-   "bin": "src/cli.js",
+   "bin": "dist/cli.js",
    "scripts": {
+      "build": "tsc && sed -i.bak '1s|^|#!/usr/bin/env node|' dist/cli.js && rm dist/cli.js.bak",
+      "dev": "npm run build && node dist/cli.js",
+      "clean": "rm -rf dist",
       "check-node-version": "check-node-version --npm 8.5.5",
       "commitlint": "commitlint --from 01ab77f",
       "eslint": "eslint .",
@@ -26,6 +29,8 @@
    "devDependencies": {
       "@silvermine/eslint-config": "3.2.1",
       "@silvermine/standardization": "2.2.3",
-      "check-node-version": "4.2.1"
+      "@types/node": "16.18.126",
+      "check-node-version": "4.2.1",
+      "typescript": "5.8.3"
    }
 }

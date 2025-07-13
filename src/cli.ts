@@ -1,15 +1,11 @@
-#!/usr/bin/env node
-
-'use strict';
-
-const { program } = require('commander'),
-      chalk = require('chalk'),
-      readline = require('readline'),
-      Handlebars = require('handlebars'),
-      marked = require('marked'),
-      fm = require('front-matter'),
-      fs = require('fs'),
-      path = require('path');
+import { program } from 'commander';
+import chalk from 'chalk';
+import readline from 'readline';
+import Handlebars from 'handlebars';
+import marked from 'marked';
+import fm from 'front-matter';
+import path from 'path';
+import { readFile } from 'fs/promises';
 
 program
    .option('-t, --template <filename>', 'the template to render with', 'simple-list')
@@ -20,22 +16,32 @@ program.parse();
 
 const options = program.opts();
 
-const logger = {
+interface Logger {
+   debug: (message: string) => void;
+   errorAndQuit: (message: string) => never;
+}
 
-   debug: (message) => {
+const logger: Logger = {
+
+   debug: (message: string): void => {
       if (options.verbose) {
          process.stderr.write(chalk.gray('[DEBUG] ') + message + '\n');
       }
    },
 
-   errorAndQuit: (message) => {
+   errorAndQuit: (message: string): never => {
       process.stderr.write(chalk.red('[ERROR] ') + message + '\n');
       process.exit(1); // eslint-disable-line no-process-exit
    },
 
 };
 
-async function readPipedInput() {
+enum InputParsingMode {
+   FrontMatter = 'frontmatter',
+   JSON = 'json',
+}
+
+async function readPipedInput(): Promise<unknown[] | undefined> {
    if (process.stdin.isTTY) {
       // Don't take stdin from terminal
       return;
@@ -44,17 +50,17 @@ async function readPipedInput() {
    const rl = readline.createInterface({ input: process.stdin, terminal: false });
 
    return new Promise((resolve) => {
-      const objects = [];
+      const objects: unknown[] = [];
 
       let buf = '',
-          mode;
+          mode: InputParsingMode | undefined;
 
-      rl.on('line', (line) => {
+      rl.on('line', (line: string) => {
          if (!mode) {
             if (line === '---') {
-               mode = 'frontmatter';
+               mode = InputParsingMode.FrontMatter;
             } else {
-               mode = 'json';
+               mode = InputParsingMode.JSON;
             }
          }
 
@@ -63,7 +69,7 @@ async function readPipedInput() {
          // After each line, attempt to parse the buffer. This is what supports ndjson.
          // TODO: What's the perf impact of this?
          try {
-            if (mode === 'json') {
+            if (mode === InputParsingMode.JSON) {
                objects.push(JSON.parse(buf));
                buf = '';
             }
@@ -74,10 +80,11 @@ async function readPipedInput() {
 
       rl.once('close', () => {
          if (buf) {
-            if (mode === 'json') {
+            if (mode === InputParsingMode.JSON) {
                objects.push(JSON.parse(buf));
-            } else if (mode === 'frontmatter') {
-               const { attributes, body } = fm(buf);
+            } else if (mode === InputParsingMode.FrontMatter) {
+               // TODO: better type checking here?
+               const { attributes, body } = fm<object>(buf);
 
                objects.push({
                   ...attributes,
@@ -91,45 +98,52 @@ async function readPipedInput() {
    });
 }
 
-async function readTemplate(nameOrFilePath) {
+async function readTemplate(nameOrFilePath: string): Promise<string> {
    const prebuiltTemplatePath = path.join(__dirname, '..', 'templates', `${nameOrFilePath}.hbs`),
-         prebuiltTemplate = await fs.promises.readFile(prebuiltTemplatePath, 'utf-8').catch(() => { return undefined; });
+         prebuiltTemplate = await readFile(prebuiltTemplatePath, 'utf-8').catch(() => { return undefined; });
 
    if (prebuiltTemplate) {
       return prebuiltTemplate;
    }
 
-   return await fs.promises.readFile(nameOrFilePath, 'utf-8');
+   return await readFile(nameOrFilePath, 'utf-8');
 }
 
-(async () => {
+interface TemplateContext {
+   record: unknown;
+   records: unknown[];
+}
+
+(async (): Promise<void> => {
    logger.debug(`Arguments: ${JSON.stringify(program.args, undefined, 3)}`);
    logger.debug(`Options: ${JSON.stringify(options, undefined, 3)}`);
 
    const template = Handlebars.compile(await readTemplate(options.template)),
          stdinRecords = await readPipedInput();
 
-   Handlebars.registerHelper('json', (context) => {
+   Handlebars.registerHelper('json', (context: unknown): string => {
       return JSON.stringify(context, undefined, 3);
    });
 
-   Handlebars.registerHelper('length', (context) => {
+   Handlebars.registerHelper('length', (context: unknown[]): number => {
       return context.length;
    });
 
-   Handlebars.registerHelper('stripTags', (context) => {
+   Handlebars.registerHelper('stripTags', (context: string): string => {
       return context ? context.replace(/<[^>]*>?/gm, '') : context;
    });
 
-   Handlebars.registerHelper('markdown', (context) => {
-      return new Handlebars.SafeString(marked.parse(context));
+   Handlebars.registerHelper('markdown', (context: string): unknown => {
+      return new Handlebars.SafeString(marked.parse(context, {
+         async: false,
+      }));
    });
 
    if (!stdinRecords) {
       logger.errorAndQuit('No input was piped into stdin');
    }
 
-   const templateContext = {
+   const templateContext: TemplateContext = {
       record: stdinRecords[0],
       records: stdinRecords,
    };
