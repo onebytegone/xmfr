@@ -6,7 +6,7 @@
       "xmfr": "dist/cli.js"
    },
    "scripts": {
-      "build": "tsc && sed -i.bak '1s|^|#!/usr/bin/env node|' dist/cli.js && rm dist/cli.js.bak",
+      "build": "tsc && sed -i.bak '1s|^|#!/usr/bin/env node\\n|' dist/cli.js && rm dist/cli.js.bak",
       "dev": "npm run build && node dist/cli.js",
       "clean": "rm -rf dist",
       "check-node-version": "check-node-version --npm 10.5.0",
