@@ -2,7 +2,9 @@
    "name": "xmfr",
    "version": "0.0.3",
    "description": "CLI tool to transform JSON into text using a template",
-   "bin": "dist/cli.js",
+   "bin": {
+      "xmfr": "dist/cli.js"
+   },
    "scripts": {
       "build": "tsc && sed -i.bak '1s|^|#!/usr/bin/env node|' dist/cli.js && rm dist/cli.js.bak",
       "dev": "npm run build && node dist/cli.js",
@@ -18,7 +20,10 @@
       "generate-examples": "bash scripts/generate-examples.sh"
    },
    "author": "Ethan Smith",
-   "repository": "github:onebytegone/xmfr",
+   "repository": {
+      "type": "git",
+      "url": "git+https://github.com/onebytegone/xmfr.git"
+   },
    "license": "MIT",
    "dependencies": {
       "chalk": "4.1.2",
