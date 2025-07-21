@@ -7,7 +7,7 @@
       "build": "tsc && sed -i.bak '1s|^|#!/usr/bin/env node|' dist/cli.js && rm dist/cli.js.bak",
       "dev": "npm run build && node dist/cli.js",
       "clean": "rm -rf dist",
-      "check-node-version": "check-node-version --npm 8.5.5",
+      "check-node-version": "check-node-version --npm 10.5.0",
       "commitlint": "commitlint --from 01ab77f",
       "eslint": "eslint .",
       "markdownlint": "markdownlint-cli2",
@@ -31,7 +31,7 @@
    "devDependencies": {
       "@silvermine/eslint-config": "3.2.1",
       "@silvermine/standardization": "2.2.3",
-      "@types/node": "16.18.126",
+      "@types/node": "20.12.14",
       "check-node-version": "4.2.1",
       "typescript": "5.8.3"
    }
