@@ -2,16 +2,20 @@
    "name": "xmfr",
    "version": "0.0.2",
    "description": "CLI tool to transform JSON into text using a template",
-   "bin": "src/cli.js",
+   "bin": "dist/cli.js",
    "scripts": {
-      "check-node-version": "check-node-version --npm 8.5.5",
+      "build": "tsc && sed -i.bak '1s|^|#!/usr/bin/env node|' dist/cli.js && rm dist/cli.js.bak",
+      "dev": "npm run build && node dist/cli.js",
+      "clean": "rm -rf dist",
+      "check-node-version": "check-node-version --npm 10.5.0",
       "commitlint": "commitlint --from 01ab77f",
       "eslint": "eslint .",
       "markdownlint": "markdownlint-cli2",
       "standards": "npm run commitlint && npm run markdownlint && npm run eslint",
       "release:preview": "node ./node_modules/@silvermine/standardization/scripts/release.js preview",
       "release:prep-changelog": "node ./node_modules/@silvermine/standardization/scripts/release.js prep-changelog",
-      "release:finalize": "node ./node_modules/@silvermine/standardization/scripts/release.js finalize"
+      "release:finalize": "node ./node_modules/@silvermine/standardization/scripts/release.js finalize",
+      "generate-examples": "bash scripts/generate-examples.sh"
    },
    "author": "Ethan Smith",
    "repository": "github:onebytegone/xmfr",
@@ -21,11 +25,14 @@
       "commander": "11.1.0",
       "front-matter": "4.0.2",
       "handlebars": "4.7.8",
-      "marked": "14.1.3"
+      "marked": "14.1.3",
+      "simpledotcss": "2.3.7"
    },
    "devDependencies": {
       "@silvermine/eslint-config": "3.2.1",
       "@silvermine/standardization": "2.2.3",
-      "check-node-version": "4.2.1"
+      "@types/node": "20.12.14",
+      "check-node-version": "4.2.1",
+      "typescript": "5.8.3"
    }
 }
