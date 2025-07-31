@@ -38,6 +38,6 @@
       "@silvermine/standardization": "2.2.3",
       "@types/node": "20.12.14",
       "check-node-version": "4.2.1",
-      "typescript": "5.8.3"
+      "typescript": "5.9.2"
    }
 }
