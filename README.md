@@ -84,6 +84,19 @@ $ cat newline-delimited-items.ndjson | xmfr --print-context
    * `--print-context`
    * `--help`
 
+### Creating Templates with AI (Experimental)
+
+Writing handlebars templates manually can be cumbersome. Use the included prompt template
+to have an AI agent generate templates for you:
+
+   1. Copy the contents of `docs/xmfr-template-generator-prompt.md`
+   2. Paste it into your AI agent conversation
+   3. Describe your data structure and desired output format
+   4. The agent will (hopefully) generate a properly structured handlebars template
+
+The prompt template includes all xmfr-specific context, helpers, and patterns needed for
+reliable template generation.
+
 ### Install/Upgrade
 
 ```bash
