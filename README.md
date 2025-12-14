@@ -5,75 +5,164 @@ format using templates.
 
 ## Examples
 
-### Single JSON Object
+### Basic Usage
+
+Transform JSON data into HTML using built-in templates:
 
 ```bash
-$ cat single-item.json
-{
-   "animal": "Aardvark"
-}
-$ cat single-item.json | xmfr --print-context
+# Use the simple-list template (default)
+$ echo '{"name": "John", "age": 30}' | xmfr
+```
+
+### Data Structure Examples
+
+xmfr normalizes all input into a consistent structure with `record` (first item) and
+`records` (all items):
+
+#### Single JSON Object
+
+```bash
+$ echo '{"animal": "Aardvark"}' | xmfr --print-context
 {
    "record": { "animal": "Aardvark" },
+   "records": [ { "animal": "Aardvark" } ]
+}
+```
+
+#### Array of Objects (treated as single record)
+
+```bash
+$ echo '[{"name": "Alice"}, {"name": "Bob"}]' | xmfr --print-context
+{
+   "record": [ {"name": "Alice"}, {"name": "Bob"} ],
+   "records": [ [ {"name": "Alice"}, {"name": "Bob"} ] ]
+}
+```
+
+#### Newline Delimited JSON
+
+```bash
+$ cat data.ndjson
+{"name": "Alice", "age": 25}
+{"name": "Bob", "age": 30}
+
+$ cat data.ndjson | xmfr --print-context
+{
+   "record": { "name": "Alice", "age": 25 },
    "records": [
-      { "animal": "Aardvark" }
+      { "name": "Alice", "age": 25 },
+      { "name": "Bob", "age": 30 }
    ]
 }
 ```
 
-### Array of JSON Objects
+### Transformation Examples
 
-```bash
-$ cat array-of-items.json
-[
-   { "animal": "Aardvark" },
-   { "animal": "Beaver" },
-   { "animal": "Capybara" }
-]
-$ cat array-of-items.json | xmfr --print-context
-{
-   "record": { "animal": "Aardvark" },
-   "records": [
-      { "animal": "Aardvark" },
-      { "animal": "Beaver" },
-      { "animal": "Capybara" }
-   ]
-}
+#### People Directory
+
+**Input data (people.ndjson):**
+
+```json
+{"name": "Alice Smith", "email": "alice@example.com", "age": 28}
+{"name": "Bob Jones", "email": "bob@example.com", "age": 32}
 ```
 
-### Newline Delimited JSON Objects
+**Template (people-cards.hbs):**
 
-```bash
-$ cat newline-delimited-items.ndjson
-{ "animal": "Aardvark" }
-{ "animal": "Beaver" }
-{ "animal": "Capybara" }
-$ cat newline-delimited-items.ndjson | xmfr --print-context
-{
-   "record": { "animal": "Aardvark" },
-   "records": [
-      { "animal": "Aardvark" },
-      { "animal": "Beaver" },
-      { "animal": "Capybara" }
-   ]
-}
+```handlebars
+<!DOCTYPE html>
+<html>
+<head>
+   <title>People Directory</title>
+   <style>{{rawFileContents 'node_modules/simpledotcss/simple.min.css'}}</style>
+</head>
+<body>
+   <h1>People Directory ({{length records}} people)</h1>
+   <div class="cards">
+   {{#each records}}
+      <div class="card">
+         <h3>{{this.name}}</h3>
+         <p>Email: {{this.email}}</p>
+         <p>Age: {{this.age}}</p>
+      </div>
+   {{/each}}
+   </div>
+</body>
+</html>
 ```
 
-### Markdown with Front Matter
+**Command:**
 
 ```bash
-$ cat document.md
----
-title: Animals
----
-Aardvark Beaver Capybara
-$ cat newline-delimited-items.ndjson | xmfr --print-context
-{
-   "record": { "title": "Animals", "body", "Aardvark Beaver Capybara" },
-   "records": [
-      { "title": "Animals", "body", "Aardvark Beaver Capybara" }
-   ]
-}
+cat people.ndjson | xmfr -t people-cards.hbs > directory.html
+```
+
+**Output:**
+
+```html
+<!DOCTYPE html>
+<html>
+<head>
+   <title>People Directory</title>
+   <style>/* Simple.css styles included */</style>
+</head>
+<body>
+   <h1>People Directory (2 people)</h1>
+   <div class="cards">
+      <div class="card">
+         <h3>Alice Smith</h3>
+         <p>Email: alice@example.com</p>
+         <p>Age: 28</p>
+      </div>
+      <div class="card">
+         <h3>Bob Jones</h3>
+         <p>Email: bob@example.com</p>
+         <p>Age: 32</p>
+      </div>
+   </div>
+</body>
+</html>
+```
+
+#### Markdown Blog Posts
+
+**Input (posts.ndjson):**
+
+```json
+{"title": "Hello World", "date": "2024-01-01", "content": "# Welcome\n\nThis is my first post."}
+{"title": "Second Post", "date": "2024-01-02", "content": "## Update\n\nHere's another post."}
+```
+
+**Template (blog.hbs):**
+
+```handlebars
+<!DOCTYPE html>
+<html>
+<head>
+   <title>My Blog</title>
+   <style>{{rawFileContents 'node_modules/@picocss/pico/css/pico.fluid.classless.slate.min.css'}}</style>
+</head>
+<body>
+   <main>
+      <h1>My Blog</h1>
+      {{#each records}}
+         <article>
+            <header>
+               <h2>{{this.title}}</h2>
+               <time>{{this.date}}</time>
+            </header>
+            {{markdown this.content}}
+         </article>
+      {{/each}}
+   </main>
+</body>
+</html>
+```
+
+**Command:**
+
+```bash
+cat posts.ndjson | xmfr -t blog.hbs > blog.html
 ```
 
 ## Usage
@@ -83,6 +172,19 @@ $ cat newline-delimited-items.ndjson | xmfr --print-context
    * `-t <path>` / `--template <path>`
    * `--print-context`
    * `--help`
+
+### Creating Templates with AI (Experimental)
+
+Writing handlebars templates manually can be cumbersome. Use the included prompt template
+to have an AI agent generate templates for you:
+
+   1. Copy the contents of `docs/xmfr-template-generator-prompt.md`
+   2. Paste it into your AI agent conversation
+   3. Describe your data structure and desired output format
+   4. The agent will (hopefully) generate a properly structured handlebars template
+
+The prompt template includes all xmfr-specific context, helpers, and patterns needed for
+reliable template generation.
 
 ### Install/Upgrade
 
